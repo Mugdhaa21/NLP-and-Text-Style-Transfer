@@ -115,8 +115,8 @@ class ParserModel(nn.Module):
         ###     Gather: https://pytorch.org/docs/stable/torch.html#torch.gather
         ###     View: https://pytorch.org/docs/stable/tensors.html#torch.Tensor.view
         ###     Flatten: https://pytorch.org/docs/stable/generated/torch.flatten.html
-        x = self.embeddings[w]  # Select embeddings for given indices
-        x = x.view(len(w), -1)  # Reshape the tensor
+        x = self.embeddings[w]  
+        x = x.view(len(w), -1)
 
 
         ### END YOUR CODE
