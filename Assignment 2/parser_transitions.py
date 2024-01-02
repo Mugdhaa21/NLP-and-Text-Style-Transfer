@@ -32,9 +32,9 @@ class PartialParse(object):
         ### Note: If you need to use the sentence object to initialize anything, make sure to not directly 
         ###       reference the sentence object.  That is, remember to NOT modify the sentence object. 
 
-        self.stack = ["ROOT"]  # Initialize stack with "ROOT"
-        self.buffer = list(sentence)  # Initialize buffer with the given sentence
-        self.dependencies = []  # Initialize an empty list for dependencies
+        self.stack = ["ROOT"]  
+        self.buffer = list(sentence)  
+        self.dependencies = [] 
 
         ### END YOUR CODE
 
@@ -54,17 +54,14 @@ class PartialParse(object):
         ###         2. Left Arc
         ###         3. Right Arc
         if transition == "S":
-            # Shift: move the first item from buffer to stack
             self.stack.append(self.buffer.pop(0))
 
         elif transition == "LA":
-            # Left Arc: create a dependency from the second item on the stack to the last item on the stack
             dependent = self.stack.pop(-2)
             head = self.stack[-1]
             self.dependencies.append((head, dependent))
 
         elif transition == "RA":
-            # Right Arc: create a dependency from the last item on the stack to the second item on the stack
             dependent = self.stack.pop()
             head = self.stack[-1]
             self.dependencies.append((head, dependent))
@@ -118,29 +115,20 @@ def minibatch_parse(sentences, model, batch_size):
     ###             contains references to the same objects. Thus, you should NOT use the `del` operator
     ###             to remove objects from the `unfinished_parses` list. This will free the underlying memory that
     ###             is being accessed by `partial_parses` and may cause your code to crash.
-    # Initialize a list to hold partial parses for each sentence
+    
     partial_parses = [PartialParse(sentence) for sentence in sentences]
-    # Track which parses have finished
+    
     unfinished_parses = partial_parses[:]
-    # Process until all parses are complete
+   
     while unfinished_parses:
-        # Get the batch size or the number of remaining parses, whichever is smaller
         batch = min(batch_size, len(unfinished_parses))
-        # Get a batch of parses to process
         parsing_batch = unfinished_parses[:batch]
-
-        # Predict transitions for the current batch using the model
         transitions = model.predict(parsing_batch)
-
-        # Apply predicted transitions to the parses in the batch
         for i in range(batch):
             parsing_batch[i].parse_step(transitions[i])
-
-        # Check which parses are completed and remove them from the unfinished list
         completed_parses = [parse for parse in parsing_batch if len(parse.stack) == 1 and len(parse.buffer) == 0]
         for parse in completed_parses:
             unfinished_parses.remove(parse)
-        # Collect dependencies from completed parses
     dependencies = [parse.dependencies for parse in partial_parses]
     ### END YOUR CODE
 
